@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notion Landing + Features + Pricing + More Sections + Auth</title>
+  <style>
+    /* Reset & base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #f9f9f9;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: #00bfa5;
+      padding: 1.5rem 2rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: #009e8e;
+    }
+
+    /* Top toggleable sections container */
+    #top-sections > section {
+      max-width: 900px;
+      margin: 1rem auto 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgb(0 0 0 / 0.07);
+      user-select: none;
+      padding: 1rem 1rem 0;
+      display: none;
+    }
+    #top-sections > section.active {
+      display: block;
+      animation: fadeIn 0.5s ease forwards;
+    }
+    #top-sections > section h2 {
+      font-size: 2rem;
+      color: #00796b;
+      padding: 1rem 1rem 1rem 1rem;
+      border-bottom: 2px solid #ddd;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    /* Accordion inside Features */
+    .feature-item {
+      border-bottom: 1px solid #ddd;
+    }
+    .feature-title {
+      padding: 1rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #00bfa5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.3s ease;
+    }
+    .feature-title:hover {
+      background: #e0f7f4;
+    }
+    .feature-title::after {
+      content: '+';
+      font-weight: bold;
+      transition: transform 0.3s ease;
+    }
+    .feature-title.active::after {
+      content: '−'; /* minus sign */
+    }
+
+    .feature-content {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 1rem;
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.5;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .feature-content.open {
+      padding: 1rem;
+      max-height: 500px; /* enough for content */
+    }
+
+    /* Pricing table */
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 2rem;
+    }
+    .pricing-table th, .pricing-table td {
+      border: 1px solid #ddd;
+      padding: 1rem 1.5rem;
+      text-align: center;
+    }
+    .pricing-table th {
+      background: #00bfa5;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .pricing-table tbody tr:hover {
+      background: #f0fdfa;
+    }
+    .price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00796b;
+    }
+
+    /* Integrations & Templates specific styling */
+    #integrations p, #templates p {
+      font-size: 1.1rem;
+      color: #555;
+      margin: 0 1rem 1rem 1rem;
+    }
+    #integrations ul, #templates ul {
+      list-style: none;
+      margin: 0 1rem 1.5rem 1rem;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    #integrations li, #templates li {
+      background: #e0f7f4;
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      font-weight: 600;
+      color: #00796b;
+      flex: 1 1 calc(50% - 1rem);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 3px 8px rgb(0 191 165 / 0.2);
+      user-select: none;
+    }
+    /* Integration icons using simple emojis */
+    #integrations li::before {
+      content: "🔗";
+      font-size: 1.2rem;
+    }
+    /* Templates icons using different emoji */
+    #templates li::before {
+      content: "📄";
+      font-size: 1.2rem;
+    }
+
+    /* Main hero */
+    main {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, #e0f7f4, #f9f9f9);
+      user-select: none;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgb(0 0 0 / 0.05);
+    }
+    main h2 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      color: #00796b;
+      max-width: 700px;
+    }
+    main p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      color: #555;
+    }
+    .btn {
+      background: #00bfa5;
+      color: white;
+      padding: 1rem 3rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.3s ease;
+      user-select: none;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover {
+      background: #009e8e;
+    }
+
+    /* Sign In/Up container - hidden by default */
+    #auth-section {
+      max-width: 420px;
+      margin: 2rem auto 4rem;
+      background: #fff;
+      padding: 2.5rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 15px 40px rgb(0 0 0 / 0.1);
+      display: none;
+      user-select: none;
+    }
+
+    /* Show auth section when active */
+    #auth-section.active {
+      display: block;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    /* Tabs styles */
+    .tabs {
+      display: flex;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #ddd;
+      cursor: pointer;
+    }
+    .tabs label {
+      flex: 1;
+      text-align: center;
+      padding: 0.8rem 0;
+      font-weight: 600;
+      color: #777;
+      border-bottom: 3px solid transparent;
+      transition: color 0.3s ease, border-bottom-color 0.3s ease;
+      user-select: none;
+    }
+    input[type="radio"] {
+      display: none;
+    }
+    #signin-tab:checked ~ .tabs label[for="signin-tab"],
+    #signup-tab:checked ~ .tabs label[for="signup-tab"] {
+      color: #00bfa5;
+      border-bottom-color: #00bfa5;
+    }
+
+    /* Forms */
+    form {
+      display: none;
+      animation: fadeIn 0.5s ease forwards;
+    }
+    #signin-tab:checked ~ form.signin-form,
+    #signup-tab:checked ~ form.signup-form {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 1.4rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      color: #444;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    .form-group input:focus {
+      border-color: #00bfa5;
+      outline: none;
+      box-shadow: 0 0 8px rgb(0 191 165 / 0.4);
+    }
+
+    /* Buttons */
+    .btn-submit {
+      width: 100%;
+      padding: 0.8rem 0;
+      background: #00bfa5;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    .btn-submit:hover {
+      background: #009e8e;
+    }
+
+    /* Forgot password link */
+    .forgot-link {
+      display: block;
+      margin-top: 0.8rem;
+      text-align: right;
+      font-size: 0.9rem;
+      color: #00bfa5;
+      cursor: pointer;
+      user-select: none;
+    }
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      #integrations ul, #templates ul {
+        flex-direction: column;
+      }
+      #integrations li, #templates li {
+        flex: 1 1 100%;
+      }
+      header {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      main h2 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Notion Pro</h1>
+    <nav>
+      <a href="#" data-target="features">Features</a>
+      <a href="#" data-target="pricing">Pricing</a>
+      <a href="#" data-target="templates">Templates</a>
+      <a href="#" data-target="integrations">Integrations</a>
+      <a href="#" id="sign-in-btn">Sign In</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Your Ultimate Productivity Hub</h2>
+    <p>Manage projects, notes, tasks, and workflows all in one beautiful, customizable workspace.</p>
+    <button class="btn" id="get-started-btn">Get Started Free</button>
+  </main>
+
+  <!-- Top sections -->
+  <div id="top-sections">
+    <!-- Features Section -->
+    <section id="features" class="active">
+      <h2>Features</h2>
+      <div class="feature-item">
+        <div class="feature-title">Real-time Collaboration</div>
+        <div class="feature-content">
+          Work simultaneously with your team and see updates live in real time without conflicts.
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-title">Customizable Templates</div>
+        <div class="feature-content">
+          Use or create templates to fit your workflow and save tons of time on repetitive setups.
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-title">Powerful Integrations</div>
+        <div class="feature-content">
+          Connect your favorite tools like Google Drive, Slack, Zapier, and more for seamless automation.
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-title">Offline Mode</div>
+        <div class="feature-content">
+          Work without interruption, even without internet connection, and sync your data when back online.
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-title">Mobile Apps</div>
+        <div class="feature-content">
+          Access and edit your workspace on the go with apps for iOS and Android devices.
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing">
+      <h2>Pricing</h2>
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Price</th>
+            <th>Users</th>
+            <th>Features</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Free</td>
+            <td class="price">$0/month</td>
+            <td>1 user</td>
+            <td>Basic Features, 1000 Blocks</td>
+          </tr>
+          <tr>
+            <td>Personal</td>
+            <td class="price">$8/month</td>
+            <td>1 user</td>
+            <td>Unlimited Blocks, Version History</td>
+          </tr>
+          <tr>
+            <td>Team</td>
+            <td class="price">$20/month</td>
+            <td>Up to 10 users</td>
+            <td>Collaboration, Permissions</td>
+          </tr>
+          <tr>
+            <td>Enterprise</td>
+            <td class="price">Contact Us</td>
+            <td>Unlimited</td>
+            <td>Advanced Security, Dedicated Support</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Templates Section (Improved) -->
+    <section id="templates">
+      <h2>Templates</h2>
+      <p>Explore professionally designed templates tailored to your needs. Customize or create your own with ease.</p>
+      <ul>
+        <li>📋 Project Management Boards</li>
+        <li>📝 Personal Planners & Journals</li>
+        <li>📈 Business & Marketing Plans</li>
+        <li>💰 Budget Trackers</li>
+        <li>🗓️ Content Calendars</li>
+      </ul>
+    </section>
+
+    <!-- Integrations Section (Improved) -->
+    <section id="integrations">
+      <h2>Integrations</h2>
+      <p>Connect Notion with hundreds of popular apps and tools to automate your workflows and boost productivity.</p>
+      <ul>
+        <li>📁 Google Drive & Docs Sync</li>
+        <li>💬 Slack Notifications</li>
+        <li>⚙️ Zapier Automations</li>
+        <li>🐙 GitHub & Jira</li>
+        <li>📅 Calendar & Email Sync</li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- Sign In / Sign Up -->
+  <section id="auth-section">
+    <input type="radio" id="signin-tab" name="auth-tab" checked />
+    <input type="radio" id="signup-tab" name="auth-tab" />
+    <div class="tabs">
+      <label for="signin-tab">Sign In</label>
+      <label for="signup-tab">Sign Up</label>
+    </div>
+
+    <form class="signin-form">
+      <div class="form-group">
+        <label for="signin-email">Email</label>
+        <input id="signin-email" type="email" placeholder="Enter your email" required />
+      </div>
+      <div class="form-group">
+        <label for="signin-password">Password</label>
+        <input id="signin-password" type="password" placeholder="Enter your password" required />
+      </div>
+      <button type="submit" class="btn-submit">Sign In</button>
+      <span class="forgot-link">Forgot Password?</span>
+    </form>
+
+    <form class="signup-form">
+      <div class="form-group">
+        <label for="signup-name">Full Name</label>
+        <input id="signup-name" type="text" placeholder="Your full name" required />
+      </div>
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <input id="signup-email" type="email" placeholder="Enter your email" required />
+      </div>
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <input id="signup-password" type="password" placeholder="Create a password" required />
+      </div>
+      <button type="submit" class="btn-submit">Sign Up</button>
+    </form>
+  </section>
+
+  <script>
+    // Accordion logic for features
+    document.querySelectorAll('.feature-title').forEach(title => {
+      title.addEventListener('click', () => {
+        title.classList.toggle('active');
+        const content = title.nextElementSibling;
+        if (content.classList.contains('open')) {
+          content.classList.remove('open');
+        } else {
+          content.classList.add('open');
+        }
+      });
+    });
+
+    // Show/Hide sections based on nav clicks
+    const navLinks = document.querySelectorAll('nav a[data-target]');
+    const sections = document.querySelectorAll('#top-sections > section');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = link.getAttribute('data-target');
+        sections.forEach(sec => {
+          if (sec.id === target) {
+            sec.classList.add('active');
+          } else {
+            sec.classList.remove('active');
+          }
+        });
+      });
+    });
+
+    // Show auth section on Sign In click and Get Started
+    const authSection = document.getElementById('auth-section');
+    document.getElementById('sign-in-btn').addEventListener('click', e => {
+      e.preventDefault();
+      authSection.classList.add('active');
+      window.scrollTo({ top: authSection.offsetTop, behavior: 'smooth' });
+    });
+    document.getElementById('get-started-btn').addEventListener('click', e => {
+      authSection.classList.add('active');
+      window.scrollTo({ top: authSection.offsetTop, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
